@@ -1,0 +1,192 @@
+/*
+ * Copyright 2018, The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.example.android.guesstheword.screens.game
+
+import android.os.Bundle
+import android.text.format.DateUtils
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.example.android.guesstheword.R
+import com.example.android.guesstheword.databinding.GameFragmentBinding
+import kotlinx.android.synthetic.main.game_fragment.*
+
+/**
+ * Fragment where the game is played
+ */
+class GameFragment : Fragment() {
+
+    private lateinit var viewModel: GameViewModel
+
+
+    /*
+    we will shift the following commented code to the viewmodel class as the following variable
+    needs to survive config changes
+    the word list should also needed to moved as we should know what are the word left from the list
+
+
+    // The current word
+    private var word = ""
+
+    // The current score
+    private var score = 0
+
+    // The list of words - the front of the list is the next word to guess
+    private lateinit var wordList: MutableList<String>*/
+
+    private lateinit var binding: GameFragmentBinding // binding is not moved to the viewmodel class as it has all the refernce to the view
+                                                        //we are using the
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+
+        // Inflate view and obtain an instance of the binding class
+        binding = DataBindingUtil.inflate(
+                inflater,
+                R.layout.game_fragment,
+                container,
+                false
+        )
+
+
+        Log.i("GameFragment","GameFragement called")
+        viewModel=ViewModelProviders.of(this).get(GameViewModel::class.java)
+
+
+        binding.correctButton.setOnClickListener {
+            onCorrect()
+
+        }
+        binding.skipButton.setOnClickListener { onSkip() }
+
+
+        //observer's
+        word.observe(viewLifecycleOwner, Observer { newWord->
+            binding.wordText.text = word.value
+
+        })
+
+        currentTime.observe(viewLifecycleOwner, Observer { newTime->
+            binding.timerText.text= DateUtils.formatElapsedTime(newTime)
+        })
+
+        // we have set a abserver to the score so that when ever it is updated from the viewmodel class it known and updated here
+        score.observe(viewLifecycleOwner, Observer {newScore ->
+
+                binding.scoreText.text =newScore.toString()
+            })
+
+        eventGameFinish.observe(viewLifecycleOwner, Observer {
+            if (it){
+                gameFinished()
+                onGameFinished()
+
+            }
+        })
+
+
+
+
+
+        return binding.root
+
+    }
+
+    /**
+     * Resets the list of words and randomizes the order
+     */
+    /*private fun resetList() {
+        wordList = mutableListOf(
+                "queen",
+                "hospital",
+                "basketball",
+                "cat",
+                "change",
+                "snail",
+                "soup",
+                "calendar",
+                "sad",
+                "desk",
+                "guitar",
+                "home",
+                "railway",
+                "zebra",
+                "jelly",
+                "car",
+                "crow",
+                "trade",
+                "bag",
+                "roll",
+                "bubble"
+        )
+        wordList.shuffle()
+    }*/
+
+    /**
+     * Called when the game is finished
+     */
+    private fun gameFinished() {
+        val action = GameFragmentDirections.actionGameToScore(score.value?: 0)
+
+        findNavController(this).navigate(action)
+
+    }
+
+    /**
+     * Moves to the next word in the list
+     */
+  /*  private fun nextWord() {
+        //Select and remove a word from the list
+        if (wordList.isEmpty()) {
+            gameFinished()
+        } else {
+            word = wordList.removeAt(0)
+        }
+        updateWordText()
+        updateScoreText()
+    }*/
+
+    /** Methods for buttons presses **/
+//     Since the function of the fragment is limited to just the interface and its susceptible to config changes we pass the button handling
+//    to the viewmodel
+     /*fun onSkip() {
+        score--
+        nextWord()
+    }
+
+     fun onCorrect() {
+        score++
+        nextWord()
+    }*/
+
+    /** Methods for updating the UI **/
+
+
+}
+/*
+the game fragment only contain the code needed to display the proper value and captures user event, it should not have any ui data that we need to survive rotations
+it should not contain any part that processes the data
+
+ */
