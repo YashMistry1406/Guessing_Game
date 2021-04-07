@@ -1,3 +1,4 @@
+Notes for the following lesson:-https://www.notion.so/Lesson-5-App-Architecture-UI-Layer-64d121c4fd4a4f1c844229f99aa0bf7a
 # Application Architecture - The UI Layer - Guess It!
 This is the toy app for lesson 5 of the [Android App Development in Kotlin course on Udacity](https://www.udacity.com/course/developing-android-apps-with-kotlin--ud9012).
 
